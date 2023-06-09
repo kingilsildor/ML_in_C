@@ -9,7 +9,6 @@ float train[][2] = {
     {3, 6},
     {4, 8},
 };
-
 #define train_count (sizeof(train)/sizeof(train[0]))
 
 /* y = x *  w;
@@ -28,8 +27,9 @@ float cost(float w){
     for(size_t i = 0; i < train_count; i++){
         float x = train[i][0];
         float y = x * w;
-        float distance = y - train[i][0];
+        float distance = y - train[i][1];
         result += distance * distance;
+        // printf("%f, %f, %f, %f, %f\n", w, x, y, distance, result);
     }
     result /= train_count;
     return result;
@@ -37,13 +37,18 @@ float cost(float w){
 
 int main(){   
     srand(69);
-    float w = rand_float()*100.0f;
-    float eps = 1e-3;
+    float w = rand_float()*10.0f;
 
-    printf("cost: %f\n", cost(w)); 
-    printf("cost: %f\n", cost(w + eps));  
-    printf("cost: %f\n", cost(w + eps * 2)); 
- 
+    float eps = 1e-3;
+    float learning_rate = 1e-3;
+    int iterations = 500;
+
+    for (size_t i = 0; i < iterations; i++){
+        float dcost = (cost(w + eps) - cost(w)) / eps;      
+        w -= learning_rate * dcost;
+        printf("cost = %f, w = %f\n", cost(w), w);
+    }
+    // printf("W: %f\n", w);
 
     return 0;
 }
