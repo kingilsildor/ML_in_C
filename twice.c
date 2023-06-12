@@ -40,7 +40,6 @@ int main(){
     float w = rand_float()*10.0f;
     float b = rand_float()*5.0f;
 
-    float eps = 1e-3;
     float learning_rate = 1e-3;
     int iterations = 500;
 
