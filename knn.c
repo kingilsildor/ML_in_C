@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 
 #define MAX_LINE_LENGTH 256
@@ -8,7 +9,15 @@
 
 // Array data: [x1, x2, x3, x4, y]
 
-float euclidean_distance()
+float distance(float* array1, float* array2, int column_len) {
+    float distance = 0.0;
+
+    for (size_t i = 0; i < column_len; i++) {
+        distance += pow(array1[i] - array2[i], 2);
+    }
+
+    return sqrt(distance);  
+}
 
 int main() { 
     char line[MAX_LINE_LENGTH];
@@ -52,6 +61,15 @@ int main() {
    
     }
     
+    float distance_array[numRows];
+    // for (size_t i = 0; i < numRows; i++) {
+    //     for (int j = 0; j < numRows; j++) {
+    //         if (i > j){
+    //             // distance_array[i] = distance(data[i], data[j], MAX_NUM_COLUMN);
+    //             printf("%d\n", data[i]);
+    //         }
+    //     }
+    // }
     for (size_t i = 1; i < numRows; i++) {
         for (int j = 0; j < MAX_NUM_COLUMN; j++) {
             printf("%s ", data[i][j]);
