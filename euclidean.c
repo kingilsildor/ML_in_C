@@ -1,39 +1,47 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
-float train[][4] = {
-    {3,2,0,0},
-    {2,1,1,0},
-};
+#define MAX_LINE_LENGTH 256
+#define MAX_NUM_ROWS 256
+#define MAX_NUM_COLUMN 5
+#define MAX_TOKEN_LENGTH 100
 
-#define row_count sizeof(train)/sizeof(train[0])
-#define column_count sizeof(train[0]) / sizeof(train[0][0])
+// Array data: [x1, x2, x3, x4, y]
 
 float distance(float* array1, float* array2, int column_len) {
     float distance = 0.0;
 
     for (size_t i = 0; i < column_len; i++) {
-        distance += pow(array1[i] - array2[i], 2);
+        distance += powf(array1[i] - array2[i], 2);
     }
 
-    return sqrt(distance);  
+    return sqrtf(distance);  
 }
 
-int main(){
-    float distance_array[row_count];
-    // d = sqrt((p1 - q1)**2 + (p2 - q2)**2)
-    for (size_t i = 0; i < row_count; i++){
-        for (size_t j = 0; j < row_count; j++) {
-            if (i > j){
-                distance_array[i] = distance(train[i], train[j], column_count);
-                printf("%f\n", distance_array[i]);
-            }
-        }           
+int main() { 
+    
+    float point1[][4] = {{3.5, 2.5, 0.5, 0.5},
+                        {4.5, 2.5, 1.0, 3.0}};
+
+    int numRows = sizeof(point1) / sizeof(point1[0]);
+    int numColumns = sizeof(point1[0]) / sizeof(point1[0][0]);
+    
+    float* point2 = point1[1];   
+    float distance_list[numRows]; 
+
+    for (size_t i = 0; i < numRows; i++)
+    {
+        if(i + 1 > numRows){
+            break;
+        }
+
+        distance_list[i] = distance((float*)point1[i], (float*)point1[i + 1], numColumns);
+        printf("distance = %f, i = %d\n", distance_list[i], i);
     }
     
-    // float d = sqrt(pow((euq[0][1]- euq[1][1]),2));
-    // printf("%f", d);
-
-
+    
+    float distance_int = distance((float*)point1[0], (float*)point2, numColumns);
+    
     return 0;
 }
