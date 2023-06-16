@@ -22,7 +22,8 @@ float distance(float* array1, float* array2, int column_len) {
 int main() { 
     
     float point1[][4] = {{3.5, 2.5, 0.5, 0.5},
-                        {4.5, 2.5, 1.0, 3.0}};
+                        {4.5, 2.5, 1.0, 3.0},
+                        {1.0, 3.0, 1.5, 3.0}};
 
     int numRows = sizeof(point1) / sizeof(point1[0]);
     int numColumns = sizeof(point1[0]) / sizeof(point1[0][0]);
@@ -30,14 +31,11 @@ int main() {
     float* point2 = point1[1];   
     float distance_list[numRows]; 
 
-    for (size_t i = 0; i < numRows; i++)
-    {
-        if(i + 1 > numRows){
-            break;
-        }
-
-        distance_list[i] = distance((float*)point1[i], (float*)point1[i + 1], numColumns);
-        printf("distance = %f, i = %d\n", distance_list[i], i);
+    for (size_t i = 0; i < numRows; i++) {
+        for (size_t j = i + 1; j < numRows; j++) {
+            distance_list[i] = distance((float*)point1[i], (float*)point1[j], numColumns);
+            printf("i = %d, j = %d\n", i, j);
+        }     
     }
     
     
