@@ -38,8 +38,7 @@ int main() {
         }     
     }
     
-    
-    float distance_int = distance((float*)point1[0], (float*)point2, numColumns);
-    
+    int size = sizeof(distance_list) / sizeof(distance_list[0]);
+    printf("arr size = %d", size);    
     return 0;
 }
