@@ -43,14 +43,18 @@ int main(){
 
         if (numValues == MAX_NUM_COLUMN) {
             // skip the header
-            for (size_t i = 0; i < numValues - 1; i++) {
-                data[numRows].x[i] = atof(values[i]); 
+            for (size_t i = 0; i < numValues; i++) {
+                if (i == MAX_NUM_COLUMN - 1) {
+                    data[numRows].y = strdup(values[i]);                        
+                } 
+                data[numRows].x[i] = atof(values[i]);
             }
         }
+
         numRows++;          
     }
 
-    for (int i = 1; i < 10; i++) {
+     for (int i = 1; i < 10; i++) {
         printf("Element %d:\n", i);
         printf("x[0]: %f\n", data[i].x[0]);
         printf("x[1]: %f\n", data[i].x[1]);
