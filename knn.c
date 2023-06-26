@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAX_LINE_LENGTH 256
@@ -10,22 +11,19 @@
 struct Data{
     // Array data: [x1, x2, x3, x4, y]
     float x[MAX_NUM_COLUMN - 1];
-    char* y;
+    char *y;
 };
-
 
 int main(){
     char line[MAX_LINE_LENGTH];
     char *token;
     struct Data data[MAX_NUM_ROWS];
-    // char data[MAX_NUM_ROWS][MAX_NUM_COLUMN][MAX_LINE_LENGTH];
     int numRows = 0; 
 
     // Open file and check if file is valid.
     FILE* file = fopen("data/iris_dataset.csv", "r");
     if (file == NULL) {
         perror("Failed to open the file.\n");
-        fclose(file);
         return 1;
     }
 
@@ -42,10 +40,19 @@ int main(){
         }
 
         if (numValues == MAX_NUM_COLUMN) {
-            // skip the header
             for (size_t i = 0; i < numValues; i++) {
+
                 if (i == MAX_NUM_COLUMN - 1) {
-                    data[numRows].y = strdup(values[i]);                        
+                    // Clean the string to remove the \n
+                    size_t length = strcspn(values[i], "\n");
+                    values[i][length] = '\0';
+                    
+                    data[numRows].y = malloc(sizeof(char) * 20);
+                    data[numRows].y = values[i];
+
+                    if(data[numRows].y == NULL){
+                        printf("Memory allocation failed for data[%d].y\n", i);
+                    }
                 } 
                 data[numRows].x[i] = atof(values[i]);
             }
@@ -53,15 +60,16 @@ int main(){
 
         numRows++;          
     }
+    fclose(file);
 
-     for (int i = 1; i < 10; i++) {
-        printf("Element %d:\n", i);
-        printf("x[0]: %f\n", data[i].x[0]);
-        printf("x[1]: %f\n", data[i].x[1]);
-        printf("x[2]: %f\n", data[i].x[2]);
-        printf("x[3]: %f\n", data[i].x[3]);
+    for (int i = 1; i < 10; i++) {
+        // printf("Element %d:\n", i);
+        // printf("x[0]: %f\n", data[i].x[0]);
+        // printf("x[1]: %f\n", data[i].x[1]);
+        // printf("x[2]: %f\n", data[i].x[2]);
+        // printf("x[3]: %f\n", data[i].x[3]);
+        // printf("y: %s\n", data[i].y);
     }
 
-    fclose(file);
     return 0;
 }
