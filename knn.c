@@ -41,20 +41,17 @@ int main(){
 
         if (numValues == MAX_NUM_COLUMN) {
             for (size_t i = 0; i < numValues; i++) {
+                float temp_float = atof(values[i]);
+                data[numRows].x[i] = floor(temp_float * 100) / 100;
 
                 if (i == MAX_NUM_COLUMN - 1) {
                     // Clean the string to remove the \n
                     size_t length = strcspn(values[i], "\n");
                     values[i][length] = '\0';
                     
-                    data[numRows].y = malloc(sizeof(char) * 20);
                     data[numRows].y = values[i];
-
-                    if(data[numRows].y == NULL){
-                        printf("Memory allocation failed for data[%d].y\n", i);
-                    }
-                } 
-                data[numRows].x[i] = atof(values[i]);
+                }
+                
             }
         }
 
@@ -63,12 +60,12 @@ int main(){
     fclose(file);
 
     for (int i = 1; i < 10; i++) {
-        // printf("Element %d:\n", i);
-        // printf("x[0]: %f\n", data[i].x[0]);
-        // printf("x[1]: %f\n", data[i].x[1]);
-        // printf("x[2]: %f\n", data[i].x[2]);
-        // printf("x[3]: %f\n", data[i].x[3]);
-        // printf("y: %s\n", data[i].y);
+        printf("Element %d:\n", i);
+        printf("x[0]: %.2f\n", data[i].x[0]);
+        printf("x[1]: %.2f\n", data[i].x[1]);
+        printf("x[2]: %.2f\n", data[i].x[2]);
+        printf("x[3]: %.2f\n", data[i].x[3]);
+        printf("y: %s\n", data[i].y);
     }
 
     return 0;
