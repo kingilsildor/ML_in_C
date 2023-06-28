@@ -46,7 +46,7 @@ int main(){
             if (numValues == MAX_NUM_COLUMN - 1) {
                 // Clean the string to remove the \n
                 size_t length = strcspn(values[numValues], "\n");
-                values[numValues][length] = '\0';
+                values[numValues][length] = '\0'; 
                     
                 data[numRows].iris_class = values[numValues];
             }
@@ -55,16 +55,18 @@ int main(){
             token = strtok(NULL, ",");
         }
         numRows++;               
-    }    
+    } 
 
-    for (int i = 1; i < 10; i++) {
-        printf("Element %d:\n", i);
-        printf("iris_values[0]: %.2f\n", data[i].iris_values[0]);
-        printf("iris_values[1]: %.2f\n", data[i].iris_values[1]);
-        printf("iris_values[2]: %.2f\n", data[i].iris_values[2]);
-        printf("iris_values[3]: %.2f\n", data[i].iris_values[3]);
-        printf("iris_class: %s\n", data[i].iris_class);
-    }
+    // for (int i = 1; i < 10; i++) {
+    //     printf("Element %d:\n", i);
+    //     printf("iris_values[0]: %.2f\n", data[i].iris_values[0]);
+    //     printf("iris_values[1]: %.2f\n", data[i].iris_values[1]);
+    //     printf("iris_values[2]: %.2f\n", data[i].iris_values[2]);
+    //     printf("iris_values[3]: %.2f\n", data[i].iris_values[3]);
+    //     printf("iris_class: %s\n", data[i].iris_class);
+    // }
+
+    
 
     fclose(file);
     return 0;
