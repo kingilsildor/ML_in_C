@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAX_LINE_LENGTH 256
 #define MAX_NUM_ROWS 256
 #define MAX_NUM_COLUMN 5
 #define MAX_TOKEN_LENGTH 40
-
-
 
 struct Iris_Data{
     /*
@@ -15,16 +14,16 @@ struct Iris_Data{
     iris_values3 = petal length (cm)  iris_values4 = petal width (cm)
     */
     int iris_values[MAX_NUM_COLUMN - 1];
-    char *iris_class;
+    char* iris_class;
 };
 
 struct Euclidean_Distance{
     float distance;
-    char *compared_iris_class;
+    char* compared_iris_class;
 };
 
-float distance(float *data_one, float *data_two, int column_size) {
-    float distance = 0.0;
+float distance(int* data_one, int* data_two, int column_size) {
+    int distance = 0;
     const int SQUARED = 2;
 
     for (size_t i = 0; i < column_size; i++){
@@ -34,10 +33,11 @@ float distance(float *data_one, float *data_two, int column_size) {
     return sqrtf(distance); 
 }
 
+
 int main(){
     char line[MAX_LINE_LENGTH];    
-    struct Iris_Data dataset[MAX_LINE_LENGTH];
-    char *token;
+    struct Iris_Data dataset[MAX_NUM_ROWS];
+    char* token;
     int numRows = 0;
     
     // Open file and check if file is valid.
@@ -56,7 +56,8 @@ int main(){
         token = strtok(line, ",");        
 
         int numValues = 0;
-        char *csv_values[MAX_NUM_COLUMN];
+        char* csv_values[MAX_NUM_COLUMN];        
+
         while (token != NULL && numValues < MAX_NUM_COLUMN) {          
             csv_values[numValues] = token;  
 
@@ -77,15 +78,21 @@ int main(){
         numRows++;               
     }
 
-    for (size_t i = 0; i < numRows; i++){
-        printf("Element %d:\n", i);
-        printf("iris_values[0]: %d\n", dataset[i].iris_values[0]);
-        printf("iris_values[1]: %d\n", dataset[i].iris_values[1]);
-        printf("iris_values[2]: %d\n", dataset[i].iris_values[2]);
-        printf("iris_values[3]: %d\n", dataset[i].iris_values[3]);
-        printf("iris_class: %s\n\n", dataset[i].iris_class);
-    }
-      
+    struct Iris_Data* testSet;
+    struct Iris_Data* trainSet;
+    float testRatio = 0.2;    
+
+    int dataset_size = sizeof(dataset) / sizeof(dataset[0]);
+    printf("%d", dataset_size); 
+
+    // for (size_t i = 0; i < numRows; i++){
+    //     printf("Element %d:\n", i);
+    //     printf("iris_values[0]: %d\n", dataset[i].iris_values[0]);
+    //     printf("iris_values[1]: %d\n", dataset[i].iris_values[1]);
+    //     printf("iris_values[2]: %d\n", dataset[i].iris_values[2]);
+    //     printf("iris_values[3]: %d\n", dataset[i].iris_values[3]);
+    //     printf("iris_class: %s\n\n", dataset[i].iris_class);
+    // }
 
     fclose(file);
     return 0;
