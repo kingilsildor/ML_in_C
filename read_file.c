@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #define MAX_LINE_LENGTH 256
-#define MAX_NUM_ROWS 256
+#define INITIAL_CAPACITY 10
 #define MAX_NUM_COLUMN 5
 #define MAX_TOKEN_LENGTH 40
 
@@ -17,28 +17,12 @@ struct Iris_Data{
     char* iris_class;
 };
 
-struct Euclidean_Distance{
-    float distance;
-    char* compared_iris_class;
-};
-
-float distance(int* data_one, int* data_two, int column_size) {
-    int distance = 0;
-    const int SQUARED = 2;
-
-    for (size_t i = 0; i < column_size; i++){
-        distance += powf(data_one[i] - data_two[i], SQUARED);
-    }
-
-    return sqrtf(distance); 
-}
-
-
 int main(){
-    char line[MAX_LINE_LENGTH];    
-    struct Iris_Data dataset[MAX_NUM_ROWS];
+    struct Iris_Data* dataset = malloc(INITIAL_CAPACITY * sizeof(struct Iris_Data));
+    char line[MAX_LINE_LENGTH];  
+    int capacity = INITIAL_CAPACITY;
     char* token;
-    int numRows = 0;
+    int numRows = 0;    
     
     // Open file and check if file is valid.
     FILE* file = fopen("data/iris_dataset.csv", "r");
@@ -50,7 +34,6 @@ int main(){
     // Skip header
     fgets(line, sizeof(line), file);   
     
-
     // Process the lines in the csv file
     while (fgets(line, sizeof(line), file) != NULL) {   
         token = strtok(line, ",");        
@@ -75,15 +58,22 @@ int main(){
             numValues++; 
             token = strtok(NULL, ",");
         }
-        numRows++;               
-    }
+        
+        numRows++;
 
-    struct Iris_Data* testSet;
-    struct Iris_Data* trainSet;
-    float testRatio = 0.2;    
-
-    int dataset_size = sizeof(dataset) / sizeof(dataset[0]);
-    printf("%d", dataset_size); 
+        // Check if the dataset array needs to be expanded
+        if (numRows == capacity) {
+            capacity *= 2;
+            struct Iris_Data* temp = realloc(dataset, capacity * sizeof(struct Iris_Data));
+            if (temp == NULL) {
+                fprintf(stderr, "Memory reallocation failed.\n");
+                free(dataset);
+                fclose(file);
+                return 1;
+            }
+            dataset = temp;
+        }               
+    }  
 
     // for (size_t i = 0; i < numRows; i++){
     //     printf("Element %d:\n", i);
@@ -95,5 +85,6 @@ int main(){
     // }
 
     fclose(file);
+    free(dataset);
     return 0;
 }
