@@ -17,6 +17,22 @@ struct Iris_Data{
     char* iris_class;
 };
 
+struct Euclidean_Distance{
+    float distance;
+    int element_one;
+    int element_two;
+};
+
+float distance(struct Iris_Data* data_one, struct Iris_Data* data_two, int column_len) {
+    int distance = 0;
+    const int SQUARED = 2;
+
+    for (size_t i = 0; i < column_len; i++){
+        distance += powf(data_one->iris_values[i] - data_two->iris_values[i], SQUARED);
+    }
+    return sqrtf(distance); 
+}
+
 int main(){
     struct Iris_Data* dataset = malloc(INITIAL_CAPACITY * sizeof(struct Iris_Data));
     char line[MAX_LINE_LENGTH];  
@@ -65,26 +81,39 @@ int main(){
         if (numRows == capacity) {
             capacity *= 2;
             struct Iris_Data* temp = realloc(dataset, capacity * sizeof(struct Iris_Data));
+
             if (temp == NULL) {
-                fprintf(stderr, "Memory reallocation failed.\n");
+                perror("Memory reallocation failed.\n");
                 free(dataset);
                 fclose(file);
                 return 1;
             }
             dataset = temp;
         }               
-    }  
+    }
 
-    // for (size_t i = 0; i < numRows; i++){
-    //     printf("Element %d:\n", i);
-    //     printf("iris_values[0]: %d\n", dataset[i].iris_values[0]);
-    //     printf("iris_values[1]: %d\n", dataset[i].iris_values[1]);
-    //     printf("iris_values[2]: %d\n", dataset[i].iris_values[2]);
-    //     printf("iris_values[3]: %d\n", dataset[i].iris_values[3]);
-    //     printf("iris_class: %s\n\n", dataset[i].iris_class);
-    // }
+    fclose(file);  
+    
+    struct Euclidean_Distance distance_array[numRows];
+    for (size_t i = 0; i < numRows; i++) {
+        if (i == 0){
+            continue;;
+        }
 
-    fclose(file);
+        distance_array[i].distance = distance(&dataset[0], &dataset[i], MAX_NUM_COLUMN - 1);
+        distance_array[i].element_one = 0;
+        distance_array[i].element_two = i;         
+    }
+
+    for (size_t i = 1; i < numRows; i++){
+        printf("Element %d:\n", i);
+        printf("distance: %.2f\n", distance_array[i].distance);
+        printf("element one: %d\n", distance_array[i].element_one);
+        printf("element two: %d\n", distance_array[i].element_two);
+        printf("\n");
+    }
+
+    
     free(dataset);
     return 0;
 }
