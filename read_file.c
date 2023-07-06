@@ -23,12 +23,12 @@ struct Euclidean_Distance{
     int element_two;
 };
 
-float distance(struct Iris_Data* data_one, struct Iris_Data* data_two, int column_len) {
+float euclidean_distance(struct Iris_Data* point_one, struct Iris_Data* point_two, int column_len) {
     int distance = 0;
     const int SQUARED = 2;
 
     for (size_t i = 0; i < column_len; i++){
-        distance += powf(data_one->iris_values[i] - data_two->iris_values[i], SQUARED);
+        distance += powf(point_one->iris_values[i] - point_two->iris_values[i], SQUARED);
     }
     return sqrtf(distance); 
 }
@@ -93,14 +93,43 @@ int main(){
     }
 
     fclose(file);  
-    
+
+
+    // Train test split
+    const float TRAIN_PERCENTAGE = 0.7;
+    const int DATASET_SIZE = numRows;
+    const int TRAIN_SIZE = DATASET_SIZE * TRAIN_PERCENTAGE;
+    const int TEST_SIZE = DATASET_SIZE - TRAIN_SIZE; 
+ 
+    struct Iris_Data* train_data = malloc(TRAIN_SIZE * sizeof(struct Iris_Data));
+    struct Iris_Data* test_data = malloc(TEST_SIZE * sizeof(struct Iris_Data));
+
+    // Shuffle the dataset
+    for (int i = 0; i < DATASET_SIZE; i++) {
+        int j = rand() % (i + 1);
+        struct Iris_Data temp = dataset[i];
+        dataset[i] = dataset[j];
+        dataset[j] = temp;
+    }
+
+    for (int i = 0; i < TRAIN_SIZE; i++) {
+        train_data[i] = dataset[i];
+    }
+
+    for (int i = 0; i < TEST_SIZE; i++) {
+        test_data[i] = dataset[TRAIN_SIZE + i];
+    }
+        
+    free(dataset);
+
+
     struct Euclidean_Distance distance_array[numRows];
     for (size_t i = 0; i < numRows; i++) {
         if (i == 0){
             continue;;
         }
 
-        distance_array[i].distance = distance(&dataset[0], &dataset[i], MAX_NUM_COLUMN - 1);
+        distance_array[i].distance = euclidean_distance(&dataset[0], &dataset[i], MAX_NUM_COLUMN - 1);
         distance_array[i].element_one = 0;
         distance_array[i].element_two = i;         
     }
@@ -114,6 +143,7 @@ int main(){
     }
 
     
-    free(dataset);
+    free(train_data);
+    free(test_data);
     return 0;
 }
