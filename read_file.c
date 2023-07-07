@@ -7,6 +7,7 @@
 #define INITIAL_CAPACITY 10
 #define MAX_NUM_COLUMN 5
 #define MAX_TOKEN_LENGTH 40
+#define K 5
 
 struct Iris_Data{
     /*
@@ -31,6 +32,23 @@ float euclidean_distance(struct Iris_Data* point_one, struct Iris_Data* point_tw
         distance += powf(point_one->iris_values[i] - point_two->iris_values[i], SQUARED);
     }
     return sqrtf(distance); 
+}
+
+int compare(const void* point_one, const void* point_two){
+    const struct Euclidean_Distance* array_one = (const struct Euclidean_Distance* ) point_one;
+    const struct Euclidean_Distance* array_two = (const struct Euclidean_Distance* ) point_two;
+
+    if(array_one->distance > array_two->distance){
+        return 1;
+    }
+    
+    if(array_one->distance < array_two->distance){
+        return -1;
+    }
+
+    if (array_one->distance == array_two->distance){
+        return 0;
+    }
 }
 
 int main(){
@@ -60,15 +78,16 @@ int main(){
         while (token != NULL && numValues < MAX_NUM_COLUMN) {          
             csv_values[numValues] = token;  
 
-            float temp_float_save = atof(csv_values[numValues]);           
-            dataset[numRows].iris_values[numValues] = round(temp_float_save * 100);
+            float float_to_int_save = atof(csv_values[numValues]);           
+            dataset[numRows].iris_values[numValues] = round(float_to_int_save * 100);
             
             if (numValues == MAX_NUM_COLUMN - 1) {
                 // Clean the string to remove the \n
                 size_t length = strcspn(csv_values[numValues], "\n");
                 csv_values[numValues][length] = '\0'; 
-                    
-                dataset[numRows].iris_class = csv_values[numValues];
+
+                dataset[numRows].iris_class = malloc((length) * sizeof(char));
+                strcpy(dataset[numRows].iris_class, csv_values[numValues]);
             }
 
             numValues++; 
@@ -105,8 +124,9 @@ int main(){
     struct Iris_Data* test_data = malloc(TEST_SIZE * sizeof(struct Iris_Data));
 
     // Shuffle the dataset
-    for (int i = 0; i < DATASET_SIZE; i++) {
+    for (int i = numRows - 1; i > 0; i--) {
         int j = rand() % (i + 1);
+
         struct Iris_Data temp = dataset[i];
         dataset[i] = dataset[j];
         dataset[j] = temp;
@@ -118,31 +138,33 @@ int main(){
 
     for (int i = 0; i < TEST_SIZE; i++) {
         test_data[i] = dataset[TRAIN_SIZE + i];
+    }    
+
+    for (size_t i = 0; i < numRows; i++) {
+        free(dataset[i].iris_class);
     }
-        
     free(dataset);
 
 
     struct Euclidean_Distance distance_array[numRows];
-    for (size_t i = 0; i < numRows; i++) {
-        if (i == 0){
-            continue;;
+    const int ELEMENT = 50;
+    for (size_t i = 0; i < TRAIN_SIZE; i++) {
+        if (i == ELEMENT){
+            continue;
         }
 
-        distance_array[i].distance = euclidean_distance(&dataset[0], &dataset[i], MAX_NUM_COLUMN - 1);
-        distance_array[i].element_one = 0;
+        distance_array[i].distance = euclidean_distance(&train_data[ELEMENT], &train_data[i], MAX_NUM_COLUMN - 1);
+        distance_array[i].element_one = ELEMENT;
         distance_array[i].element_two = i;         
     }
 
-    for (size_t i = 1; i < numRows; i++){
-        printf("Element %d:\n", i);
-        printf("distance: %.2f\n", distance_array[i].distance);
-        printf("element one: %d\n", distance_array[i].element_one);
-        printf("element two: %d\n", distance_array[i].element_two);
-        printf("\n");
+    qsort(distance_array, TRAIN_SIZE, sizeof(struct Euclidean_Distance), compare);
+    for (size_t i = 1; i < K; i++) {
+        int temp = distance_array[i].element_two;
+        printf("%s\n", train_data[temp].iris_class);
     }
 
-    
+   
     free(train_data);
     free(test_data);
     return 0;
