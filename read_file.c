@@ -18,6 +18,18 @@ struct Iris_Data{
     char* iris_class;
 };
 
+struct X{
+    int index;
+    int iris_values[MAX_NUM_COLUMN - 1];
+};
+
+struct y{
+    int index;
+    char* iris_class;
+};
+
+
+
 struct Euclidean_Distance{
     float distance;
     int element_one;
@@ -126,7 +138,6 @@ int main(){
     // Shuffle the dataset
     for (int i = numRows - 1; i > 0; i--) {
         int j = rand() % (i + 1);
-
         struct Iris_Data temp = dataset[i];
         dataset[i] = dataset[j];
         dataset[j] = temp;
@@ -140,32 +151,32 @@ int main(){
         test_data[i] = dataset[TRAIN_SIZE + i];
     }    
 
-    for (size_t i = 0; i < numRows; i++) {
-        free(dataset[i].iris_class);
-    }
-    free(dataset);
 
-
-    struct Euclidean_Distance distance_array[numRows];
-    const int ELEMENT = 50;
+    struct Euclidean_Distance distance_array[TRAIN_SIZE];
+    const int ELEMENT = 25;
     for (size_t i = 0; i < TRAIN_SIZE; i++) {
         if (i == ELEMENT){
             continue;
         }
 
-        distance_array[i].distance = euclidean_distance(&train_data[ELEMENT], &train_data[i], MAX_NUM_COLUMN - 1);
+        distance_array[i].distance = euclidean_distance(&test_data[ELEMENT], &train_data[i], MAX_NUM_COLUMN - 1);
         distance_array[i].element_one = ELEMENT;
         distance_array[i].element_two = i;         
     }
 
-    qsort(distance_array, TRAIN_SIZE, sizeof(struct Euclidean_Distance), compare);
+    qsort(distance_array, TEST_SIZE, sizeof(struct Euclidean_Distance), compare);
     for (size_t i = 1; i < K; i++) {
         int temp = distance_array[i].element_two;
         printf("%s\n", train_data[temp].iris_class);
     }
 
-   
+
+    for (size_t i = 0; i < numRows; i++) {
+        free(dataset[i].iris_class);
+    }
+    free(dataset);
     free(train_data);
     free(test_data);
+
     return 0;
 }
