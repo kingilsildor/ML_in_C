@@ -6,7 +6,6 @@
 #define MAX_LINE_LENGTH 256
 #define INITIAL_CAPACITY 10
 #define MAX_NUM_COLUMN 5
-#define K 5
 
 typedef struct {
     // features = sepal length (cm), sepal width (cm), petal length (cm), petal width (cm)
@@ -25,12 +24,26 @@ typedef struct {
     char* label;
 } Distance;
 
+typedef struct {
+    Distance* distance;
+    int numRows;
+    int capacity;
+} Neighborhood;
+
 void freeDataSet(DataSet* dataset) {
     for (size_t i = 0; i < dataset->numRows; i++) {
         free(dataset->dataPoints[i].features);
         free(dataset->dataPoints[i].label);
     }
     free(dataset->dataPoints);
+}
+
+void freeNeighborhood(Neighborhood* neighborhood){
+    for (size_t i = 0; i < neighborhood->numRows; i++){
+        free(&neighborhood->distance[i].distance);
+        free(neighborhood->distance[i].label);
+    }
+    free(neighborhood->distance);
 }
 
 void resizeDataSet(DataSet* dataset) {
@@ -42,6 +55,11 @@ void resizeDataSet(DataSet* dataset) {
         freeDataSet(dataset);
         exit(1);
     }
+}
+
+void resizeNeighborhood(Neighborhood* neighbors) {
+    neighbors->capacity *= 2;
+    neighbors->distance = realloc(neighbors->distance, neighbors->capacity * sizeof(DataPoint));
 }
 
 void shuffleDataSet(DataSet* dataset) {
@@ -98,12 +116,16 @@ float euclidean_distance(DataPoint* featureList_one, DataPoint* featureList_two,
     return sqrtf(distance); 
 }
 
-void trainKNN(Distance* distance, DataPoint* testFeatures, DataSet* trainingSet) {    
-    // for (size_t i = 0; i < testFeatures->numRows; i++) {
-    for (size_t j = 0; j < trainingSet->numRows; j++) {
-       distance[j].distance = euclidean_distance(testFeatures->features, trainingSet->dataPoints[j].features, MAX_NUM_COLUMN - 1);
+void trainKNN(Neighborhood* neighbors, DataPoint* testFeatures, DataSet* trainingSet, int K) {
+    for (size_t i = 0; i < trainingSet->numRows; i++) {
+        if(neighbors->numRows == neighbors->capacity){
+            resizeNeighborhood(neighbors);
+        }       
+
+        neighbors->distance[i].distance = euclidean_distance(testFeatures, &trainingSet->dataPoints[i], MAX_NUM_COLUMN - 1);
+        neighbors->distance[i].label = trainingSet->dataPoints[i].label;
+        neighbors->numRows++;
     }
-    // }   
 }
 
 
@@ -164,10 +186,20 @@ int main() {
     const float SPLITRATIO = 0.7;
 
     splitDataSet(&dataset, SPLITRATIO, &trainingSet, &testSet);
-    freeDataSet(&dataset);
+    // freeDataSet(&dataset);
 
-    Distance* neighbors;
-    trainKNN(neighbors, &testSet.dataPoints[1], &trainingSet);
+    
+    Neighborhood neighbors;
+    neighbors.numRows = 0;
+    neighbors.capacity = INITIAL_CAPACITY;
+    neighbors.distance = malloc(neighbors.capacity * sizeof(Distance));   
+    const int K = 5;
+    trainKNN(&neighbors, &testSet.dataPoints[0], &trainingSet, K);
+
+    for (int i = 0; i < neighbors.numRows; i++) {
+        printf("Distance[%d]: %f\n", i, neighbors.distance[i].distance);
+        printf("Label: %s\n\n", neighbors.distance[i].label);
+    }
 
     return 0;
 }
